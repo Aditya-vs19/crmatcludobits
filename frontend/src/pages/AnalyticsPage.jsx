@@ -96,7 +96,7 @@ const AnalyticsPage = () => {
                 {/* Request Funnel */}
                 <div className="section-card">
                     <div className="section-header">
-                        <span className="section-icon">📊</span>
+
                         <h3 className="section-title">Request Funnel</h3>
                     </div>
                     <div className="section-content">
@@ -123,7 +123,7 @@ const AnalyticsPage = () => {
                 {/* Email Processing */}
                 <div className="section-card">
                     <div className="section-header">
-                        <span className="section-icon">📧</span>
+
                         <h3 className="section-title">Email Processing</h3>
                     </div>
                     <div className="section-content">
@@ -158,7 +158,7 @@ const AnalyticsPage = () => {
             {/* Quotation Stats */}
             <div className="section-card">
                 <div className="section-header">
-                    <span className="section-icon">💰</span>
+
                     <h3 className="section-title">Quotation Analytics</h3>
                 </div>
                 <div className="section-content">

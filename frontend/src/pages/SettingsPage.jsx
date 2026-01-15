@@ -15,7 +15,7 @@ const SettingsPage = () => {
                 {/* General Settings */}
                 <div className="section-card">
                     <div className="section-header">
-                        <span className="section-icon">⚙️</span>
+
                         <h3 className="section-title">General Settings</h3>
                     </div>
                     <div className="section-content">
@@ -67,7 +67,7 @@ const SettingsPage = () => {
                 {/* Email Configuration */}
                 <div className="section-card">
                     <div className="section-header">
-                        <span className="section-icon">📧</span>
+
                         <h3 className="section-title">Email Configuration</h3>
                     </div>
                     <div className="section-content">
@@ -123,7 +123,7 @@ const SettingsPage = () => {
             {/* System Info */}
             <div className="section-card" style={{ marginTop: '1.5rem' }}>
                 <div className="section-header">
-                    <span className="section-icon">ℹ️</span>
+
                     <h3 className="section-title">System Information</h3>
                 </div>
                 <div className="section-content">

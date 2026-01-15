@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/layout/DashboardLayout';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import './Dashboard.css';
 
@@ -8,23 +9,27 @@ const SalesDashboard = () => {
     const [quotationStats, setQuotationStats] = useState(null);
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { user } = useAuth();
 
     useEffect(() => {
-        fetchDashboardData();
-    }, []);
+        if (user?.id) {
+            fetchDashboardData();
+        }
+    }, [user?.id]);
 
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
+            // Filter requests by the logged-in user's ID  
             const [requestsRes, quotationsRes] = await Promise.all([
-                api.get('/requests?limit=10'),
+                api.get(`/requests?assignedUserId=${user.id}&limit=10`),
                 api.get('/quotations/stats').catch(() => ({ data: { data: null } })),
             ]);
 
             setRequests(requestsRes.data.data || []);
             setQuotationStats(quotationsRes.data.data);
 
-            // Calculate stats from requests
+            // Calculate stats from requests assigned to this user
             const allRequests = requestsRes.data.data || [];
             setStats({
                 assigned: allRequests.filter(r => r.funnel_stage === 'Assigned').length,
@@ -90,7 +95,7 @@ const SalesDashboard = () => {
             {/* Quotation Progress */}
             <div className="section-card">
                 <div className="section-header">
-                    <span className="section-icon">💰</span>
+
                     <h3 className="section-title">Quotation Pipeline</h3>
                 </div>
                 <div className="section-content">
@@ -134,7 +139,7 @@ const SalesDashboard = () => {
             {/* Recent Requests */}
             <div className="section-card">
                 <div className="section-header">
-                    <span className="section-icon">📝</span>
+
                     <h3 className="section-title">Recent Assigned Requests</h3>
                 </div>
                 <div className="section-content" style={{ padding: 0 }}>

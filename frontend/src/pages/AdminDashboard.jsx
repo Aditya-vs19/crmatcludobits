@@ -119,7 +119,7 @@ const AdminDashboard = () => {
         {/* Funnel Stage Counts */}
         <div className="section-card">
           <div className="section-header">
-            <span className="section-icon">📊</span>
+
             <h3 className="section-title">Funnel Stages</h3>
           </div>
           <div className="section-content">
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
         {/* Workflow Status */}
         <div className="section-card">
           <div className="section-header">
-            <span className="section-icon">〜</span>
+
             <h3 className="section-title">Workflow Status</h3>
           </div>
           <div className="section-content">
@@ -193,7 +193,7 @@ const AdminDashboard = () => {
       {/* Recent Emails Table */}
       <div className="section-card">
         <div className="section-header">
-          <span className="section-icon">📧</span>
+
           <h3 className="section-title">Recent Emails</h3>
         </div>
         <div className="section-content" style={{ padding: 0 }}>
@@ -240,7 +240,7 @@ const AdminDashboard = () => {
       {quotationStats && (
         <div className="section-card">
           <div className="section-header">
-            <span className="section-icon">💰</span>
+
             <h3 className="section-title">Quotation Metrics</h3>
           </div>
           <div className="section-content">
@@ -269,7 +269,7 @@ const AdminDashboard = () => {
       {/* Recent Requests Table */}
       <div className="section-card">
         <div className="section-header">
-          <span className="section-icon">📝</span>
+
           <h3 className="section-title">Recent Requests</h3>
         </div>
         <div className="section-content" style={{ padding: 0 }}>

@@ -144,23 +144,23 @@ export class EmailAttachment {
     /**
      * Create attachment record
      */
-    static create(attachmentData) {
+    static async create(attachmentData) {
         const { emailId, filename, contentType, size, filePath } = attachmentData;
 
-        run(`
+        await run(`
       INSERT INTO email_attachments (
         email_id, filename, content_type, size, file_path
       ) VALUES (?, ?, ?, ?, ?)
     `, [emailId, filename, contentType, size, filePath]);
 
-        return get('SELECT * FROM email_attachments WHERE email_id = ? AND filename = ?', [emailId, filename]);
+        return await get('SELECT * FROM email_attachments WHERE email_id = ? AND filename = ?', [emailId, filename]);
     }
 
     /**
      * Find attachments by email ID
      */
-    static findByEmailId(emailId) {
-        return all('SELECT * FROM email_attachments WHERE email_id = ?', [emailId]);
+    static async findByEmailId(emailId) {
+        return await all('SELECT * FROM email_attachments WHERE email_id = ?', [emailId]);
     }
 }
 
@@ -168,23 +168,23 @@ export class ExtractedData {
     /**
      * Create extracted data record
      */
-    static create(data) {
+    static async create(data) {
         const { emailId, productName, quantity, specifications, confidenceScore, rawExtraction } = data;
 
-        run(`
+        await run(`
       INSERT INTO extracted_data (
         email_id, product_name, quantity, specifications, 
         confidence_score, raw_extraction
       ) VALUES (?, ?, ?, ?, ?, ?)
     `, [emailId, productName, quantity, specifications, confidenceScore, rawExtraction]);
 
-        return get('SELECT * FROM extracted_data WHERE email_id = ?', [emailId]);
+        return await get('SELECT * FROM extracted_data WHERE email_id = ?', [emailId]);
     }
 
     /**
      * Find by email ID
      */
-    static findByEmailId(emailId) {
-        return get('SELECT * FROM extracted_data WHERE email_id = ?', [emailId]);
+    static async findByEmailId(emailId) {
+        return await get('SELECT * FROM extracted_data WHERE email_id = ?', [emailId]);
     }
 }

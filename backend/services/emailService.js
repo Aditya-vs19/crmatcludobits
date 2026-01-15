@@ -38,21 +38,25 @@ export const fetchNewEmails = (accountConfig) => {
                     return;
                 }
 
-                // Search for unseen emails
-                imap.search(['UNSEEN'], (err, results) => {
+                // Search for emails from last 24 hours (to catch already-read emails)
+                // This helps recover emails that were marked read but not saved due to previous bugs
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+
+                imap.search([['SINCE', yesterday]], (err, results) => {
                     if (err) {
                         reject(err);
                         return;
                     }
 
                     if (!results || results.length === 0) {
-                        console.log(`📭 No new emails for ${accountConfig.name}`);
+                        console.log(`📭 No recent emails for ${accountConfig.name}`);
                         imap.end();
                         resolve([]);
                         return;
                     }
 
-                    console.log(`📬 Found ${results.length} new email(s) for ${accountConfig.name}`);
+                    console.log(`📬 Found ${results.length} recent email(s) for ${accountConfig.name}`);
 
                     const fetch = imap.fetch(results, { bodies: '', markSeen: true });
 
@@ -103,13 +107,17 @@ export const parseAndSaveEmail = async (rawEmail, accountName) => {
         const parsed = await simpleParser(rawEmail);
 
         // Check if email already exists
-        const existing = Email.findByMessageId(parsed.messageId);
+        const existing = await Email.findByMessageId(parsed.messageId);
         if (existing) {
             console.log(`⏭️  Email ${parsed.messageId} already processed`);
             return existing;
         }
 
         // Create email record
+        // Convert date to MySQL datetime format (YYYY-MM-DD HH:MM:SS)
+        const emailDate = parsed.date ? new Date(parsed.date) : new Date();
+        const mysqlDatetime = emailDate.toISOString().slice(0, 19).replace('T', ' ');
+
         const emailData = {
             messageId: parsed.messageId || `generated-${Date.now()}`,
             account: accountName,
@@ -118,10 +126,10 @@ export const parseAndSaveEmail = async (rawEmail, accountName) => {
             subject: parsed.subject || '(No Subject)',
             bodyText: parsed.text || '',
             bodyHtml: parsed.html || '',
-            receivedAt: parsed.date ? parsed.date.toISOString() : new Date().toISOString(),
+            receivedAt: mysqlDatetime,
         };
 
-        const email = Email.create(emailData);
+        const email = await Email.create(emailData);
         console.log(`✅ Saved email ${email.id} from ${emailData.senderEmail}`);
 
         // Save attachments
@@ -134,7 +142,7 @@ export const parseAndSaveEmail = async (rawEmail, accountName) => {
 
                 fs.writeFileSync(filePath, attachment.content);
 
-                EmailAttachment.create({
+                await EmailAttachment.create({
                     emailId: email.id,
                     filename,
                     contentType: attachment.contentType,
@@ -152,7 +160,7 @@ export const parseAndSaveEmail = async (rawEmail, accountName) => {
 
         if (extracted.productName || extracted.quantity) {
             const { ExtractedData } = await import('../models/Email.js');
-            ExtractedData.create({
+            await ExtractedData.create({
                 emailId: email.id,
                 ...extracted,
             });
@@ -161,7 +169,7 @@ export const parseAndSaveEmail = async (rawEmail, accountName) => {
         }
 
         // Update status
-        Email.updateStatus(email.id, 'processed');
+        await Email.updateStatus(email.id, 'processed');
 
         // Forward email to other departments
         await forwardEmailToTeam(email);

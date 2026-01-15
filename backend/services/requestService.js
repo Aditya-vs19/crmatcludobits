@@ -7,14 +7,15 @@ import { ExtractedData } from '../models/Email.js';
 export const createRequestFromEmail = async (email) => {
     try {
         // Check if request already exists for this email
-        const existing = Request.findAll({ limit: 1000 }).find(r => r.email_id === email.id);
+        const allRequests = await Request.findAll({ limit: 1000 });
+        const existing = allRequests.find(r => r.email_id === email.id);
         if (existing) {
             console.log(`⏭️  Request already exists for email ${email.id}`);
             return existing;
         }
 
         // Get extracted data
-        const extractedData = ExtractedData.findByEmailId(email.id);
+        const extractedData = await ExtractedData.findByEmailId(email.id);
 
         // Determine requirements text
         let requirements = '';

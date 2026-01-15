@@ -1,29 +1,34 @@
-/* CludoBits Enterprise Dashboard Styles */
+/* CludoBits Enterprise Dashboard Styles - Premium Edition */
 
 .dashboard-container {
     min-height: 100vh;
-    background-color: #fafafa;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
-/* Dashboard Header */
+/* Dashboard Header - Premium Animation */
 .dashboard-header {
     margin-bottom: 2rem;
+    animation: fadeInUp 0.5s ease-out;
 }
 
 .dashboard-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #171717;
-    margin: 0 0 0.25rem 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--neutral-900);
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .dashboard-subtitle {
-    font-size: 0.875rem;
-    color: #737373;
+    font-size: 0.9375rem;
+    color: var(--neutral-500);
     margin: 0;
 }
 
-/* Stats Grid */
+/* Stats Grid - Animated Cards */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -33,73 +38,124 @@
 
 .stat-card {
     background: white;
-    border: 1px solid #e5e5e5;
-    border-radius: 0.5rem;
+    border: 1px solid var(--neutral-200);
+    border-radius: 1rem;
     padding: 1.5rem;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.5s ease-out backwards;
+}
+
+.stat-card:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.stat-card:nth-child(2) {
+    animation-delay: 100ms;
+}
+
+.stat-card:nth-child(3) {
+    animation-delay: 200ms;
+}
+
+.stat-card:nth-child(4) {
+    animation-delay: 300ms;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-500), var(--secondary-500));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
 }
 
 .stat-card:hover {
-    border-color: #d4d4d4;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-200);
+}
+
+.stat-card:hover::before {
+    transform: scaleX(1);
 }
 
 .stat-label {
     font-size: 0.875rem;
-    color: #737373;
-    margin-bottom: 0.5rem;
+    color: var(--neutral-500);
+    margin-bottom: 0.75rem;
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
 }
 
 .stat-value {
-    font-size: 2rem;
+    font-size: 2.25rem;
     font-weight: 700;
-    color: #171717;
+    color: var(--neutral-900);
     line-height: 1;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
 }
 
 .stat-sublabel {
-    font-size: 0.75rem;
-    color: #a3a3a3;
+    font-size: 0.8125rem;
+    color: var(--neutral-400);
 }
 
 .stat-value.warning {
-    color: #dc2626;
+    color: var(--error);
 }
 
 .stat-value.success {
-    color: #16a34a;
+    color: var(--success);
 }
 
 .stat-value.info {
-    color: #0070cc;
+    color: var(--primary-600);
 }
 
-/* Section Cards */
+/* Section Cards - Premium Glass Style */
 .section-card {
     background: white;
-    border: 1px solid #e5e5e5;
-    border-radius: 0.5rem;
+    border: 1px solid var(--neutral-200);
+    border-radius: 1rem;
     margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.5s ease-out backwards;
+    animation-delay: 400ms;
+}
+
+.section-card:hover {
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.1);
+    border-color: var(--neutral-300);
 }
 
 .section-header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e5e5e5;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--neutral-100);
+    background: linear-gradient(180deg, var(--neutral-50) 0%, white 100%);
 }
 
 .section-icon {
-    font-size: 1rem;
-    color: #737373;
+    font-size: 1.25rem;
+    color: var(--primary-500);
 }
 
 .section-title {
-    font-size: 1rem;
+    font-size: 1.0625rem;
     font-weight: 600;
-    color: #171717;
+    color: var(--neutral-800);
     margin: 0;
 }
 
@@ -107,7 +163,7 @@
     padding: 1.5rem;
 }
 
-/* Progress Bars for Categories */
+/* Progress Bars for Categories - Animated */
 .category-list {
     display: flex;
     flex-direction: column;
@@ -118,39 +174,64 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    transition: all 0.2s ease;
+}
+
+.category-item:hover {
+    transform: translateX(4px);
 }
 
 .category-name {
     width: 100px;
     font-size: 0.875rem;
-    color: #525252;
+    color: var(--neutral-600);
     flex-shrink: 0;
+    font-weight: 500;
 }
 
 .category-bar {
     flex: 1;
-    height: 8px;
-    background: #f5f5f5;
+    height: 10px;
+    background: var(--neutral-100);
     border-radius: 999px;
     overflow: hidden;
 }
 
 .category-bar-fill {
     height: 100%;
-    background: #0070cc;
+    background: linear-gradient(90deg, var(--primary-500), var(--primary-400));
     border-radius: 999px;
-    transition: width 0.5s ease;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.category-bar-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: barShine 2s ease-in-out infinite;
+}
+
+@keyframes barShine {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .category-count {
     width: 40px;
     text-align: right;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #171717;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--neutral-900);
 }
 
-/* Workflow Status */
+/* Workflow Status - Enhanced */
 .workflow-list {
     display: flex;
     flex-direction: column;
@@ -161,25 +242,34 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.workflow-item:hover {
+    background: var(--neutral-50);
 }
 
 .workflow-label {
-    width: 80px;
+    width: 90px;
     font-size: 0.875rem;
-    color: #525252;
+    color: var(--neutral-600);
     flex-shrink: 0;
+    font-weight: 500;
 }
 
 .workflow-percent {
     font-size: 0.75rem;
-    color: #a3a3a3;
+    color: var(--neutral-400);
     margin-left: 0.5rem;
+    font-weight: 600;
 }
 
 .workflow-bar {
     flex: 1;
-    height: 8px;
-    background: #f5f5f5;
+    height: 10px;
+    background: var(--neutral-100);
     border-radius: 999px;
     overflow: hidden;
 }
@@ -187,27 +277,36 @@
 .workflow-bar-fill {
     height: 100%;
     border-radius: 999px;
-    transition: width 0.5s ease;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.workflow-bar-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: barShine 2s ease-in-out infinite;
 }
 
 .workflow-bar-fill.open {
-    background: #a3a3a3;
+    background: linear-gradient(90deg, #94a3b8, #64748b);
 }
 
 .workflow-bar-fill.progress {
-    background: #0070cc;
+    background: linear-gradient(90deg, #6366f1, #818cf8);
 }
 
 .workflow-bar-fill.closed {
-    background: #16a34a;
+    background: linear-gradient(90deg, #10b981, #34d399);
 }
 
 .workflow-count {
     width: 40px;
     text-align: right;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #171717;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--neutral-900);
 }
 
 /* Two Column Layout */
@@ -217,7 +316,7 @@
     gap: 1.5rem;
 }
 
-/* Table Styles */
+/* Table Styles - Premium */
 .data-table {
     width: 100%;
     border-collapse: collapse;
@@ -227,109 +326,167 @@
     text-align: left;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #737373;
+    color: var(--neutral-500);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #e5e5e5;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--neutral-200);
+    background: var(--neutral-50);
 }
 
 .data-table td {
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
     font-size: 0.875rem;
-    color: #525252;
-    border-bottom: 1px solid #f5f5f5;
+    color: var(--neutral-600);
+    border-bottom: 1px solid var(--neutral-100);
+    transition: all 0.2s ease;
 }
 
-.data-table tr:hover td {
-    background: #fafafa;
+.data-table tr {
+    transition: all 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+    background: linear-gradient(90deg, var(--primary-50) 0%, transparent 100%);
+}
+
+.data-table tbody tr:hover td {
+    color: var(--neutral-900);
 }
 
 .data-table tr:last-child td {
     border-bottom: none;
 }
 
-/* Status Chips */
+/* Status Chips - Gradient Style */
 .status-chip {
     display: inline-flex;
     align-items: center;
-    padding: 0.25rem 0.75rem;
+    padding: 0.375rem 0.875rem;
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     border-radius: 999px;
+    transition: all 0.2s ease;
+}
+
+.status-chip:hover {
+    transform: scale(1.05);
 }
 
 .status-chip.new {
-    background: #fef2f2;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
     color: #dc2626;
 }
 
 .status-chip.assigned {
-    background: #eff6ff;
-    color: #0070cc;
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    color: #4f46e5;
 }
 
 .status-chip.quoted {
-    background: #f0fdf4;
-    color: #16a34a;
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #059669;
 }
 
 .status-chip.closed {
-    background: #f5f5f5;
-    color: #525252;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    color: var(--neutral-600);
 }
 
-/* Hover Actions */
+.status-chip.pending {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #d97706;
+}
+
+.status-chip.processed {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #059669;
+}
+
+.status-chip.low {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #059669;
+}
+
+.status-chip.medium {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #d97706;
+}
+
+.status-chip.high,
+.status-chip.urgent {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #dc2626;
+}
+
+/* Hover Actions - Enhanced */
 .action-btn {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    background: transparent;
-    border: 1px solid #e5e5e5;
-    border-radius: 0.375rem;
-    color: #525252;
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    background: white;
+    border: 1px solid var(--neutral-200);
+    border-radius: 0.5rem;
+    color: var(--neutral-600);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 0;
+    transform: translateX(8px);
 }
 
 tr:hover .action-btn {
     opacity: 1;
+    transform: translateX(0);
 }
 
 .action-btn:hover {
-    background: #171717;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
     color: white;
-    border-color: #171717;
+    border-color: transparent;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25);
 }
 
-/* Loading Skeleton */
+/* Loading Skeleton - Premium Shimmer */
 .skeleton {
     background: linear-gradient(90deg,
-            #f5f5f5 25%,
-            #e5e5e5 50%,
-            #f5f5f5 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 0.375rem;
+            var(--neutral-100) 25%,
+            var(--neutral-200) 50%,
+            var(--neutral-100) 75%);
+    background-size: 400% 100%;
+    animation: shimmer 2s ease infinite;
+    border-radius: 0.5rem;
 }
 
 .skeleton-stat {
-    height: 100px;
+    height: 120px;
 }
 
 .skeleton-row {
-    height: 48px;
-    margin-bottom: 0.5rem;
+    height: 56px;
+    margin-bottom: 0.75rem;
 }
 
 @keyframes shimmer {
     0% {
-        background-position: -200% 0;
+        background-position: -400% 0;
     }
 
     100% {
-        background-position: 200% 0;
+        background-position: 400% 0;
+    }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -347,5 +504,9 @@ tr:hover .action-btn {
 @media (max-width: 768px) {
     .stats-grid {
         grid-template-columns: 1fr;
+    }
+
+    .dashboard-title {
+        font-size: 1.5rem;
     }
 }

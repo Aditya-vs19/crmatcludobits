@@ -101,7 +101,7 @@ const UsersPage = () => {
             {/* Users Table */}
             <div className="section-card">
                 <div className="section-header">
-                    <span className="section-icon">👥</span>
+
                     <h3 className="section-title">All Users</h3>
                 </div>
                 <div className="section-content" style={{ padding: 0 }}>

@@ -194,7 +194,7 @@ const RequestsPage = () => {
                                                         fontSize: '0.875rem',
                                                     }}
                                                 >
-                                                    Assign
+                                                    {request.assigned_user_id ? 'Reassign' : 'Assign'}
                                                 </button>
                                             </td>
                                         )}

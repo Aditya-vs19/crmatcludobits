@@ -1,3 +1,6 @@
+import { ForwardingLog } from '../models/ForwardingLog.js';
+import { forwardEmail, getForwardingRecipients } from './forwardingService.js';
+
 /**
  * Forward email to all departments (except the one that received it)
  */

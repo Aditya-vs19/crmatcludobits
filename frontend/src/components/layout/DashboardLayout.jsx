@@ -13,18 +13,18 @@ const DashboardLayout = ({ children }) => {
     // Navigation items based on role
     const getNavigationItems = () => {
         const baseItems = [
-            { id: 'dashboard', label: 'Dashboard', icon: '📊', path: `/${user?.role?.toLowerCase()}` },
-            { id: 'requests', label: 'Requests', icon: '📝', path: `/${user?.role?.toLowerCase()}/requests` },
-            { id: 'products', label: 'Products', icon: '📦', path: '/products' },
-            { id: 'quotations', label: 'Quotations', icon: '💰', path: '/quotations' },
-            { id: 'emails', label: 'Emails', icon: '📧', path: '/emails' },
-            { id: 'analytics', label: 'Analytics', icon: '📈', path: `/${user?.role?.toLowerCase()}/analytics` },
+            { id: 'dashboard', label: 'Dashboard', path: `/${user?.role?.toLowerCase()}` },
+            { id: 'requests', label: 'Requests', path: `/${user?.role?.toLowerCase()}/requests` },
+            { id: 'products', label: 'Products', path: '/products' },
+            { id: 'quotations', label: 'Quotations', path: '/quotations' },
+            { id: 'emails', label: 'Emails', path: '/emails' },
+            { id: 'analytics', label: 'Analytics', path: `/${user?.role?.toLowerCase()}/analytics` },
         ];
 
         // Admin gets additional items
         if (user?.role === 'Admin') {
-            baseItems.push({ id: 'users', label: 'Users', icon: '👥', path: '/admin/users' });
-            baseItems.push({ id: 'settings', label: 'Settings', icon: '⚙️', path: '/admin/settings' });
+            baseItems.push({ id: 'users', label: 'Users', path: '/admin/users' });
+            baseItems.push({ id: 'settings', label: 'Settings', path: '/admin/settings' });
         }
 
         return baseItems;
@@ -53,10 +53,13 @@ const DashboardLayout = ({ children }) => {
             <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
                 <div className="sidebar-header">
                     <div className="logo">
-                        <div className="logo-icon">
-                            <img src="/logo.png" alt="" onError={(e) => e.target.style.display = 'none'} />
-                        </div>
-                        {!sidebarCollapsed && <span className="logo-text">CludoBits</span>}
+                        {sidebarCollapsed ? (
+                            <div className="logo-icon">
+                                <img src="/logo.png" alt="CludoBits" onError={(e) => e.target.style.display = 'none'} />
+                            </div>
+                        ) : (
+                            <img src="/logo.png" alt="CludoBits" className="logo-full" onError={(e) => e.target.style.display = 'none'} />
+                        )}
                     </div>
                     <button
                         className="collapse-btn"
@@ -75,8 +78,7 @@ const DashboardLayout = ({ children }) => {
                             onClick={() => handleNavigation(item.path)}
                             title={sidebarCollapsed ? item.label : ''}
                         >
-                            <span className="nav-icon">{item.icon}</span>
-                            {!sidebarCollapsed && <span className="nav-label">{item.label}</span>}
+                            <span className="nav-label">{item.label}</span>
                         </button>
                     ))}
                 </nav>
@@ -132,14 +134,14 @@ const DashboardLayout = ({ children }) => {
                                         </div>
                                         <div className="dropdown-divider"></div>
                                         <button className="dropdown-item" onClick={() => navigate('/profile')}>
-                                            <span>👤</span> Profile
+                                            Profile
                                         </button>
                                         <button className="dropdown-item" onClick={() => navigate('/settings')}>
-                                            <span>⚙️</span> Settings
+                                            Settings
                                         </button>
                                         <div className="dropdown-divider"></div>
                                         <button className="dropdown-item logout" onClick={logout}>
-                                            <span>🚪</span> Logout
+                                            Logout
                                         </button>
                                     </div>
                                 )}

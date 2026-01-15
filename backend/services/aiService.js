@@ -18,7 +18,7 @@ export const extractIntent = async (emailBody, emailSubject = '') => {
             };
         }
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
         const prompt = `
 You are an AI assistant that extracts structured information from customer emails requesting products or services.

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '../components/layout/DashboardLayout';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import './Dashboard.css';
 
@@ -7,20 +8,24 @@ const OperationsDashboard = () => {
     const [stats, setStats] = useState(null);
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { user } = useAuth();
 
     useEffect(() => {
-        fetchDashboardData();
-    }, []);
+        if (user?.id) {
+            fetchDashboardData();
+        }
+    }, [user?.id]);
 
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
-            const requestsRes = await api.get('/requests?limit=10');
+            // Filter requests by the logged-in user's ID
+            const requestsRes = await api.get(`/requests?assignedUserId=${user.id}&limit=10`);
             const allRequests = requestsRes.data.data || [];
 
             setRequests(allRequests);
 
-            // Calculate stats
+            // Calculate stats from requests assigned to this user
             setStats({
                 assigned: allRequests.filter(r => r.funnel_stage === 'Assigned').length,
                 inProgress: allRequests.filter(r => r.funnel_stage === 'In Progress').length,
@@ -86,7 +91,7 @@ const OperationsDashboard = () => {
             {/* Workflow Progress */}
             <div className="section-card">
                 <div className="section-header">
-                    <span className="section-icon">〜</span>
+
                     <h3 className="section-title">Workflow Status</h3>
                 </div>
                 <div className="section-content">
@@ -130,7 +135,7 @@ const OperationsDashboard = () => {
             {/* Recent Requests */}
             <div className="section-card">
                 <div className="section-header">
-                    <span className="section-icon">📝</span>
+
                     <h3 className="section-title">Recent Operations</h3>
                 </div>
                 <div className="section-content" style={{ padding: 0 }}>
