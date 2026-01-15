@@ -105,10 +105,9 @@ export class Quotation {
 
         query += ' ORDER BY q.created_at DESC';
 
-        if (filters.limit) {
-            query += ' LIMIT ?';
-            params.push(parseInt(filters.limit));
-        }
+        // Embed LIMIT directly in query to avoid MySQL2 prepared statement issues
+        const limit = parseInt(filters.limit, 10) || 50;
+        query += ` LIMIT ${limit}`;
 
         const quotations = await all(query, params);
         return quotations.map(q => this.parseQuotation(q));

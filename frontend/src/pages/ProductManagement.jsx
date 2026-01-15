@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import DashboardLayout from '../components/layout/DashboardLayout';
 import ProductForm from '../components/products/ProductForm';
 import ProductList from '../components/products/ProductList';
 import api from '../services/api';
@@ -65,49 +66,51 @@ const ProductManagement = () => {
     const canDeleteProducts = user && user.role === 'Admin';
 
     return (
-        <div className="product-management">
-            <div className="page-header">
-                <div className="header-content">
-                    <h1>Product Management</h1>
-                    <p className="header-subtitle">
-                        Manage your product catalog with specifications, pricing, and availability
-                    </p>
+        <DashboardLayout>
+            <div className="product-management">
+                <div className="page-header">
+                    <div className="header-content">
+                        <h1>Product Management</h1>
+                        <p className="header-subtitle">
+                            Manage your product catalog with specifications, pricing, and availability
+                        </p>
+                    </div>
+                    {canManageProducts && (
+                        <button onClick={handleAddProduct} className="btn btn-primary">
+                            + Add Product
+                        </button>
+                    )}
                 </div>
-                {canManageProducts && (
-                    <button onClick={handleAddProduct} className="btn btn-primary">
-                        + Add Product
-                    </button>
+
+                {error && (
+                    <div className="error-banner">
+                        {error}
+                    </div>
+                )}
+
+                {loading ? (
+                    <div className="loading-state">
+                        <div className="spinner"></div>
+                        <p>Loading products...</p>
+                    </div>
+                ) : (
+                    <ProductList
+                        products={products}
+                        onEdit={canManageProducts ? handleEditProduct : null}
+                        onDelete={canDeleteProducts ? handleDeleteProduct : null}
+                        onRefresh={fetchProducts}
+                    />
+                )}
+
+                {showForm && (
+                    <ProductForm
+                        product={editingProduct}
+                        onClose={handleFormClose}
+                        onSaved={handleProductSaved}
+                    />
                 )}
             </div>
-
-            {error && (
-                <div className="error-banner">
-                    {error}
-                </div>
-            )}
-
-            {loading ? (
-                <div className="loading-state">
-                    <div className="spinner"></div>
-                    <p>Loading products...</p>
-                </div>
-            ) : (
-                <ProductList
-                    products={products}
-                    onEdit={canManageProducts ? handleEditProduct : null}
-                    onDelete={canDeleteProducts ? handleDeleteProduct : null}
-                    onRefresh={fetchProducts}
-                />
-            )}
-
-            {showForm && (
-                <ProductForm
-                    product={editingProduct}
-                    onClose={handleFormClose}
-                    onSaved={handleProductSaved}
-                />
-            )}
-        </div>
+        </DashboardLayout>
     );
 };
 

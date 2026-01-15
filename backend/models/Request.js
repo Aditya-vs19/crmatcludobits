@@ -86,10 +86,9 @@ export class Request {
 
         query += ' ORDER BY r.created_at DESC';
 
-        if (filters.limit) {
-            query += ' LIMIT ?';
-            params.push(parseInt(filters.limit));
-        }
+        // Embed LIMIT directly in query to avoid MySQL2 prepared statement issues
+        const limit = parseInt(filters.limit, 10) || 50;
+        query += ` LIMIT ${limit}`;
 
         return await all(query, params);
     }

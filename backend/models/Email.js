@@ -4,7 +4,7 @@ export class Email {
     /**
      * Create a new email record
      */
-    static create(emailData) {
+    static async create(emailData) {
         const {
             messageId,
             account,
@@ -16,34 +16,34 @@ export class Email {
             receivedAt,
         } = emailData;
 
-        run(`
+        await run(`
       INSERT INTO emails (
         message_id, account, sender_email, sender_name, 
         subject, body_text, body_html, received_at, status
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')
     `, [messageId, account, senderEmail, senderName, subject, bodyText, bodyHtml, receivedAt]);
 
-        return this.findByMessageId(messageId);
+        return await this.findByMessageId(messageId);
     }
 
     /**
      * Find email by message ID
      */
-    static findByMessageId(messageId) {
-        return get('SELECT * FROM emails WHERE message_id = ?', [messageId]);
+    static async findByMessageId(messageId) {
+        return await get('SELECT * FROM emails WHERE message_id = ?', [messageId]);
     }
 
     /**
      * Find email by ID
      */
-    static findById(id) {
-        return get('SELECT * FROM emails WHERE id = ?', [id]);
+    static async findById(id) {
+        return await get('SELECT * FROM emails WHERE id = ?', [id]);
     }
 
     /**
      * Get all emails with optional filters
      */
-    static findAll(filters = {}) {
+    static async findAll(filters = {}) {
         let query = 'SELECT * FROM emails WHERE 1=1';
         const params = [];
 
@@ -69,40 +69,39 @@ export class Email {
 
         query += ' ORDER BY received_at DESC';
 
-        if (filters.limit) {
-            query += ' LIMIT ?';
-            params.push(filters.limit);
-        }
+        // Embed LIMIT directly in query to avoid MySQL2 prepared statement issues
+        const limit = parseInt(filters.limit, 10) || 50;
+        query += ` LIMIT ${limit}`;
 
-        return all(query, params);
+        return await all(query, params);
     }
 
     /**
      * Update email status
      */
-    static updateStatus(id, status) {
-        run(`
+    static async updateStatus(id, status) {
+        await run(`
       UPDATE emails 
       SET status = ?, processed_at = CURRENT_TIMESTAMP 
       WHERE id = ?
     `, [status, id]);
 
-        return this.findById(id);
+        return await this.findById(id);
     }
 
     /**
      * Get email with attachments and extracted data
      */
-    static findByIdWithDetails(id) {
-        const email = this.findById(id);
+    static async findByIdWithDetails(id) {
+        const email = await this.findById(id);
         if (!email) return null;
 
-        const attachments = all(
+        const attachments = await all(
             'SELECT * FROM email_attachments WHERE email_id = ?',
             [id]
         );
 
-        const extractedData = get(
+        const extractedData = await get(
             'SELECT * FROM extracted_data WHERE email_id = ?',
             [id]
         );
@@ -117,12 +116,16 @@ export class Email {
     /**
      * Get statistics
      */
-    static getStats() {
-        const total = get('SELECT COUNT(*) as count FROM emails')?.count || 0;
-        const pending = get('SELECT COUNT(*) as count FROM emails WHERE status = "pending"')?.count || 0;
-        const processed = get('SELECT COUNT(*) as count FROM emails WHERE status = "processed"')?.count || 0;
+    static async getStats() {
+        const totalResult = await get('SELECT COUNT(*) as count FROM emails');
+        const pendingResult = await get('SELECT COUNT(*) as count FROM emails WHERE status = "pending"');
+        const processedResult = await get('SELECT COUNT(*) as count FROM emails WHERE status = "processed"');
 
-        const byAccount = all(`
+        const total = totalResult?.count || 0;
+        const pending = pendingResult?.count || 0;
+        const processed = processedResult?.count || 0;
+
+        const byAccount = await all(`
       SELECT account, COUNT(*) as count 
       FROM emails 
       GROUP BY account

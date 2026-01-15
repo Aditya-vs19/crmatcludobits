@@ -16,7 +16,7 @@ router.get('/me', authenticate, getCurrentUser);
 router.get('/users', authenticate, authorize('Admin'), async (req, res) => {
     try {
         const { User } = await import('../models/User.js');
-        const users = User.findAll();
+        const users = await User.findAll();
 
         res.json({
             success: true,

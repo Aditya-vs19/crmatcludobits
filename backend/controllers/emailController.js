@@ -13,21 +13,22 @@ export const getEmails = async (req, res) => {
             status,
             startDate,
             endDate,
-            limit: parseInt(limit),
+            limit: parseInt(limit, 10),
         };
 
-        const emails = Email.findAll(filters);
+        const emails = await Email.findAll(filters);
 
         res.json({
             success: true,
-            data: emails,
-            count: emails.length,
+            data: emails || [],
+            count: emails?.length || 0,
         });
     } catch (error) {
         console.error('Get emails error:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to fetch emails',
+            data: [],
         });
     }
 };
@@ -39,7 +40,7 @@ export const getEmailById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const email = Email.findByIdWithDetails(parseInt(id));
+        const email = await Email.findByIdWithDetails(parseInt(id, 10));
 
         if (!email) {
             return res.status(404).json({
@@ -89,17 +90,18 @@ export const processEmails = async (req, res) => {
  */
 export const getEmailStats = async (req, res) => {
     try {
-        const stats = Email.getStats();
+        const stats = await Email.getStats();
 
         res.json({
             success: true,
-            data: stats,
+            data: stats || { total: 0, pending: 0, processed: 0, byAccount: [] },
         });
     } catch (error) {
         console.error('Get stats error:', error);
         res.status(500).json({
             success: false,
             message: 'Failed to fetch statistics',
+            data: { total: 0, pending: 0, processed: 0, byAccount: [] },
         });
     }
 };

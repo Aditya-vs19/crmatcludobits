@@ -56,10 +56,9 @@ export class Product {
 
         query += ' ORDER BY name ASC';
 
-        if (filters.limit) {
-            query += ' LIMIT ?';
-            params.push(parseInt(filters.limit));
-        }
+        // Embed LIMIT directly in query to avoid MySQL2 prepared statement issues
+        const limit = parseInt(filters.limit, 10) || 100;
+        query += ` LIMIT ${limit}`;
 
         const products = await all(query, params);
 
