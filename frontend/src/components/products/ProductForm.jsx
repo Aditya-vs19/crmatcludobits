@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import api from '../../services/api';
-import './ProductForm.css';
 
 const ProductForm = ({ product, onClose, onSaved }) => {
     const [formData, setFormData] = useState({

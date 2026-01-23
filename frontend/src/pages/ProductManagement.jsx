@@ -4,7 +4,7 @@ import DashboardLayout from '../components/layout/DashboardLayout';
 import ProductForm from '../components/products/ProductForm';
 import ProductList from '../components/products/ProductList';
 import api from '../services/api';
-import './ProductManagement.css';
+import './Dashboard.css';
 
 const ProductManagement = () => {
     const { user } = useAuth();

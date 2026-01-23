@@ -16,6 +16,17 @@ export class Quotation {
             notes,
             status = 'Draft',
             createdBy,
+            referenceNumber,
+            customerCompany,
+            customerAddress,
+            attentionTo,
+            subject,
+            paymentTerms,
+            freight,
+            warrantyTerms,
+            delivery,
+            validityDate,
+            gstin
         } = quotationData;
 
         // Convert specifications array to JSON string
@@ -24,9 +35,15 @@ export class Quotation {
         await run(`
             INSERT INTO quotations (
                 request_id, customer_email, customer_name, product_name,
-                specifications, pricing, quantity, notes, status, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [requestId || null, customerEmail, customerName, productName, specsJson, pricing, quantity, notes, status, createdBy]);
+                specifications, pricing, quantity, notes, status, created_by,
+                reference_number, customer_company, customer_address, attention_to,
+                subject, payment_terms, freight, warranty_terms, delivery,
+                validity_date, gstin
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            requestId || null, customerEmail, customerName || null, productName, specsJson || null, pricing || null, quantity, notes || null, status, createdBy,
+            referenceNumber || null, customerCompany || null, customerAddress || null, attentionTo || null, subject || null, paymentTerms || null, freight || null, warrantyTerms || null, delivery || null, validityDate || null, gstin || null
+        ]);
 
         const quotation = await get('SELECT * FROM quotations WHERE id = LAST_INSERT_ID()');
         return this.parseQuotation(quotation);
@@ -50,8 +67,54 @@ export class Quotation {
         }
 
         return {
-            ...quotation,
+            id: quotation.id,
+            request_id: quotation.request_id,
+            requestId: quotation.request_id,
+            customer_email: quotation.customer_email,
+            customerEmail: quotation.customer_email,
+            customer_name: quotation.customer_name,
+            customerName: quotation.customer_name,
+            product_name: quotation.product_name,
+            productName: quotation.product_name,
             specifications,
+            pricing: quotation.pricing,
+            quantity: quotation.quantity,
+            notes: quotation.notes,
+            status: quotation.status,
+            subtotal: quotation.subtotal,
+            tax_rate: quotation.tax_rate,
+            taxRate: quotation.tax_rate,
+            tax_amount: quotation.tax_amount,
+            taxAmount: quotation.tax_amount,
+            total_amount: quotation.total_amount,
+            totalAmount: quotation.total_amount,
+            validity_days: quotation.validity_days,
+            validityDays: quotation.validity_days,
+            sent_at: quotation.sent_at,
+            sentBy: quotation.sent_by,
+            email_message_id: quotation.email_message_id,
+            createdBy: quotation.created_by,
+            createdAt: quotation.created_at,
+            updatedAt: quotation.updated_at,
+            // New fields
+            reference_number: quotation.reference_number,
+            referenceNumber: quotation.reference_number,
+            customer_company: quotation.customer_company,
+            customerCompany: quotation.customer_company,
+            customer_address: quotation.customer_address,
+            customerAddress: quotation.customer_address,
+            attention_to: quotation.attention_to,
+            attentionTo: quotation.attention_to,
+            subject: quotation.subject,
+            payment_terms: quotation.payment_terms,
+            paymentTerms: quotation.payment_terms,
+            freight: quotation.freight,
+            warranty_terms: quotation.warranty_terms,
+            warrantyTerms: quotation.warranty_terms,
+            delivery: quotation.delivery,
+            validity_date: quotation.validity_date,
+            validityDate: quotation.validity_date,
+            gstin: quotation.gstin
         };
     }
 
@@ -160,6 +223,28 @@ export class Quotation {
             params.push(updates.status);
         }
 
+        // New fields
+        const fieldMap = {
+            referenceNumber: 'reference_number',
+            customerCompany: 'customer_company',
+            customerAddress: 'customer_address',
+            attentionTo: 'attention_to',
+            subject: 'subject',
+            paymentTerms: 'payment_terms',
+            freight: 'freight',
+            warrantyTerms: 'warranty_terms',
+            delivery: 'delivery',
+            validityDate: 'validity_date',
+            gstin: 'gstin'
+        };
+
+        for (const [key, col] of Object.entries(fieldMap)) {
+            if (updates[key] !== undefined) {
+                fields.push(`${col} = ?`);
+                params.push(updates[key]);
+            }
+        }
+
         if (fields.length === 0) return await this.findById(id);
 
         fields.push('updated_at = CURRENT_TIMESTAMP');
@@ -229,7 +314,7 @@ export class Quotation {
 
         return {
             ...item,
-            specifications: item?.specifications ? JSON.parse(item.specifications) : [],
+            specifications: (item?.specifications && typeof item.specifications === 'string') ? JSON.parse(item.specifications) : (item?.specifications || []),
         };
     }
 
@@ -241,7 +326,7 @@ export class Quotation {
 
         return items.map(item => ({
             ...item,
-            specifications: item.specifications ? JSON.parse(item.specifications) : [],
+            specifications: (item.specifications && typeof item.specifications === 'string') ? JSON.parse(item.specifications) : (item.specifications || []),
         }));
     }
 
@@ -297,7 +382,7 @@ export class Quotation {
 
         return item ? {
             ...item,
-            specifications: item.specifications ? JSON.parse(item.specifications) : [],
+            specifications: (item.specifications && typeof item.specifications === 'string') ? JSON.parse(item.specifications) : (item.specifications || []),
         } : null;
     }
 

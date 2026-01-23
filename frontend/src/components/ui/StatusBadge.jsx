@@ -1,5 +1,3 @@
-import './StatusBadge.css';
-
 const StatusBadge = ({ status, size = 'md' }) => {
     const getStatusClass = () => {
         switch (status?.toLowerCase()) {

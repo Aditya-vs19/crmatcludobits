@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './ProductList.css';
 
 const ProductList = ({ products, onEdit, onDelete, onRefresh }) => {
     const [expandedId, setExpandedId] = useState(null);

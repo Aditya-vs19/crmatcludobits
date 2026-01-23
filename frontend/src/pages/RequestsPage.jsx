@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import AssignmentModal from '../components/requests/AssignmentModal';
+import QuotationForm from '../components/quotations/QuotationForm';
 import './Dashboard.css';
 
 const RequestsPage = () => {
@@ -12,12 +13,20 @@ const RequestsPage = () => {
     const [error, setError] = useState(null);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [showAssignModal, setShowAssignModal] = useState(false);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [showQuotationModal, setShowQuotationModal] = useState(false);
     const [filter, setFilter] = useState('all');
 
     const fetchRequests = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/requests');
+            // For Admin: fetch all requests
+            // For Sales/Operations: fetch only assigned requests
+            let url = '/requests';
+            if (user?.role !== 'Admin' && user?.id) {
+                url = `/requests?assignedUserId=${user.id}`;
+            }
+            const response = await api.get(url);
             setRequests(response.data.data || []);
             setError(null);
         } catch (err) {
@@ -29,8 +38,10 @@ const RequestsPage = () => {
     };
 
     useEffect(() => {
-        fetchRequests();
-    }, []);
+        if (user?.id) {
+            fetchRequests();
+        }
+    }, [user?.id]);
 
     const handleAssign = (request) => {
         setSelectedRequest(request);
@@ -43,29 +54,28 @@ const RequestsPage = () => {
         fetchRequests();
     };
 
+    const handleSendQuotation = (request) => {
+        setSelectedRequest(request);
+        setShowQuotationModal(true);
+    };
+
+    const handleQuotationSaved = () => {
+        fetchRequests(); // Refresh requests as status might have changed
+    };
+
     const filteredRequests = requests.filter(request => {
         if (filter === 'all') return true;
         return request.funnel_stage?.toLowerCase() === filter.toLowerCase();
     });
 
     const getStageColor = (stage) => {
-        const colors = {
-            'New': 'var(--info)',
-            'Assigned': 'var(--warning)',
-            'Quoted': 'var(--primary-500)',
-            'Closed': 'var(--success)',
-        };
-        return colors[stage] || 'var(--neutral-500)';
+        // All stages use gray/black
+        return '#48484a';
     };
 
     const getPriorityColor = (priority) => {
-        const colors = {
-            'Low': 'var(--success)',
-            'Medium': 'var(--warning)',
-            'High': 'var(--error)',
-            'Urgent': 'var(--error)',
-        };
-        return colors[priority] || 'var(--neutral-500)';
+        // All priorities use gray/black
+        return '#48484a';
     };
 
     if (loading) {
@@ -106,13 +116,14 @@ const RequestsPage = () => {
                             onClick={() => setFilter(f)}
                             style={{
                                 padding: '0.5rem 1rem',
-                                borderRadius: '8px',
-                                border: 'none',
-                                background: filter === f ? 'var(--primary-500)' : 'var(--neutral-100)',
-                                color: filter === f ? 'white' : 'var(--neutral-700)',
+                                borderRadius: '6px',
+                                border: filter === f ? '1px solid #1d1d1f' : '1px solid #d2d2d7',
+                                background: filter === f ? '#1d1d1f' : '#ffffff',
+                                color: filter === f ? 'white' : '#48484a',
                                 cursor: 'pointer',
-                                fontWeight: filter === f ? '600' : '400',
-                                transition: 'all 0.2s ease',
+                                fontWeight: filter === f ? '500' : '400',
+                                fontSize: '0.875rem',
+                                transition: 'all 0.15s ease',
                             }}
                         >
                             {f === 'all' ? 'All' : f}
@@ -131,22 +142,20 @@ const RequestsPage = () => {
                                 <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: 'var(--neutral-600)' }}>Stage</th>
                                 <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: 'var(--neutral-600)' }}>Priority</th>
                                 <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '600', color: 'var(--neutral-600)' }}>Date</th>
-                                {user?.role === 'Admin' && (
-                                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: 'var(--neutral-600)' }}>Actions</th>
-                                )}
+                                <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: 'var(--neutral-600)' }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredRequests.length === 0 ? (
                                 <tr>
-                                    <td colSpan={user?.role === 'Admin' ? 7 : 6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--neutral-500)' }}>
-                                        No requests found
+                                    <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--neutral-500)' }}>
+                                        {user?.role === 'Admin' ? 'No requests found' : 'No assigned requests found'}
                                     </td>
                                 </tr>
                             ) : (
                                 filteredRequests.map((request) => (
                                     <tr key={request.id} style={{ borderBottom: '1px solid var(--neutral-100)' }}>
-                                        <td style={{ padding: '1rem', fontFamily: 'monospace', color: 'var(--primary-600)' }}>
+                                        <td style={{ padding: '1rem', fontFamily: 'monospace', color: '#1d1d1f', fontWeight: '500' }}>
                                             {request.request_id}
                                         </td>
                                         <td style={{ padding: '1rem' }}>{request.customer_email}</td>
@@ -158,9 +167,9 @@ const RequestsPage = () => {
                                                 padding: '0.25rem 0.75rem',
                                                 borderRadius: '999px',
                                                 fontSize: '0.75rem',
-                                                fontWeight: '600',
-                                                background: `${getStageColor(request.funnel_stage)}20`,
-                                                color: getStageColor(request.funnel_stage),
+                                                fontWeight: '500',
+                                                background: '#f5f5f7',
+                                                color: '#1d1d1f',
                                             }}>
                                                 {request.funnel_stage}
                                             </span>
@@ -170,9 +179,9 @@ const RequestsPage = () => {
                                                 padding: '0.25rem 0.75rem',
                                                 borderRadius: '999px',
                                                 fontSize: '0.75rem',
-                                                fontWeight: '600',
-                                                background: `${getPriorityColor(request.priority)}20`,
-                                                color: getPriorityColor(request.priority),
+                                                fontWeight: '500',
+                                                background: '#f5f5f7',
+                                                color: '#1d1d1f',
                                             }}>
                                                 {request.priority}
                                             </span>
@@ -180,24 +189,69 @@ const RequestsPage = () => {
                                         <td style={{ padding: '1rem', color: 'var(--neutral-500)', fontSize: '0.875rem' }}>
                                             {new Date(request.created_at).toLocaleDateString()}
                                         </td>
-                                        {user?.role === 'Admin' && (
-                                            <td style={{ padding: '1rem', textAlign: 'center' }}>
+                                        <td style={{ padding: '1rem', textAlign: 'center' }}>
+                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                                                 <button
-                                                    onClick={() => handleAssign(request)}
+                                                    onClick={() => {
+                                                        setSelectedRequest(request);
+                                                        setShowDetailModal(true);
+                                                    }}
+                                                    title="View Details"
                                                     style={{
-                                                        padding: '0.5rem 1rem',
+                                                        padding: '0.375rem',
                                                         borderRadius: '6px',
-                                                        border: 'none',
-                                                        background: 'var(--primary-500)',
-                                                        color: 'white',
+                                                        border: '1px solid #d2d2d7',
+                                                        background: 'white',
+                                                        color: '#1d1d1f',
                                                         cursor: 'pointer',
-                                                        fontSize: '0.875rem',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        minWidth: '32px'
                                                     }}
                                                 >
-                                                    {request.assigned_user_id ? 'Reassign' : 'Assign'}
+                                                    👁️
                                                 </button>
-                                            </td>
-                                        )}
+
+                                                <button
+                                                    onClick={() => handleSendQuotation(request)}
+                                                    title="Send Quotation"
+                                                    style={{
+                                                        padding: '0.375rem',
+                                                        borderRadius: '6px',
+                                                        border: '1px solid #d2d2d7',
+                                                        background: 'white',
+                                                        color: '#1d1d1f',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        minWidth: '32px'
+                                                    }}
+                                                >
+                                                    📄
+                                                </button>
+
+                                                {user?.role === 'Admin' && (
+                                                    <button
+                                                        onClick={() => handleAssign(request)}
+                                                        title={request.assigned_user_id ? 'Reassign' : 'Assign'}
+                                                        style={{
+                                                            padding: '0.375rem 0.875rem',
+                                                            borderRadius: '6px',
+                                                            border: '1px solid #1d1d1f',
+                                                            background: '#1d1d1f',
+                                                            color: 'white',
+                                                            cursor: 'pointer',
+                                                            fontSize: '0.8125rem',
+                                                            fontWeight: '500',
+                                                        }}
+                                                    >
+                                                        {request.assigned_user_id ? 'Reassign' : 'Assign'}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))
                             )}
@@ -206,12 +260,159 @@ const RequestsPage = () => {
                 </div>
             </div>
 
+            {/* Assignment Modal for Admin */}
             {showAssignModal && selectedRequest && (
                 <AssignmentModal
                     request={selectedRequest}
                     onClose={() => setShowAssignModal(false)}
                     onAssign={handleAssignmentComplete}
                 />
+            )}
+
+            {/* Quotation Form Modal */}
+            {showQuotationModal && selectedRequest && (
+                <QuotationForm
+                    requestId={selectedRequest.id}
+                    quotation={{
+                        customer_email: selectedRequest.customer_email,
+                        request_id: selectedRequest.id
+                    }}
+                    onClose={() => setShowQuotationModal(false)}
+                    onSaved={handleQuotationSaved}
+                />
+            )}
+
+            {/* Request Detail Modal for Sales/Operations */}
+            {showDetailModal && selectedRequest && (
+                <div
+                    className="modal-overlay"
+                    onClick={() => setShowDetailModal(false)}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'rgba(0,0,0,0.5)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                    }}
+                >
+                    <div
+                        className="modal-content"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            background: 'white',
+                            borderRadius: '12px',
+                            padding: '2rem',
+                            maxWidth: '600px',
+                            width: '90%',
+                            maxHeight: '80vh',
+                            overflow: 'auto',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+                        }}
+                    >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '600', color: '#1d1d1f' }}>
+                                Request Details
+                            </h2>
+                            <button
+                                onClick={() => setShowDetailModal(false)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    fontSize: '1.5rem',
+                                    cursor: 'pointer',
+                                    color: '#86868b',
+                                    padding: '0.25rem',
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#86868b', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Request ID</label>
+                                    <p style={{ margin: 0, fontFamily: 'monospace', fontWeight: '600', color: '#1d1d1f' }}>{selectedRequest.request_id}</p>
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#86868b', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Status</label>
+                                    <span style={{
+                                        display: 'inline-block',
+                                        padding: '0.25rem 0.75rem',
+                                        borderRadius: '999px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: '500',
+                                        background: '#f5f5f7',
+                                        color: '#1d1d1f',
+                                    }}>{selectedRequest.funnel_stage}</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.75rem', color: '#86868b', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Customer Email</label>
+                                <p style={{ margin: 0, color: '#1d1d1f' }}>{selectedRequest.customer_email}</p>
+                            </div>
+
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.75rem', color: '#86868b', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Requirements</label>
+                                <p style={{ margin: 0, color: '#1d1d1f', whiteSpace: 'pre-wrap', background: '#f5f5f7', padding: '1rem', borderRadius: '8px' }}>{selectedRequest.requirements}</p>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#86868b', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Priority</label>
+                                    <span style={{
+                                        display: 'inline-block',
+                                        padding: '0.25rem 0.75rem',
+                                        borderRadius: '999px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: '500',
+                                        background: '#f5f5f7',
+                                        color: '#1d1d1f',
+                                    }}>{selectedRequest.priority}</span>
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#86868b', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Source</label>
+                                    <p style={{ margin: 0, color: '#1d1d1f' }}>{selectedRequest.source || 'Email'}</p>
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#86868b', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Created</label>
+                                    <p style={{ margin: 0, color: '#1d1d1f' }}>{new Date(selectedRequest.created_at).toLocaleString()}</p>
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', color: '#86868b', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Updated</label>
+                                    <p style={{ margin: 0, color: '#1d1d1f' }}>{new Date(selectedRequest.updated_at).toLocaleString()}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+                            <button
+                                onClick={() => setShowDetailModal(false)}
+                                style={{
+                                    padding: '0.75rem 1.5rem',
+                                    borderRadius: '8px',
+                                    border: '1px solid #1d1d1f',
+                                    background: '#1d1d1f',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    fontSize: '0.875rem',
+                                    fontWeight: '500',
+                                }}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </DashboardLayout>
     );

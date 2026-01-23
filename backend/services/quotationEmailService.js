@@ -8,7 +8,7 @@ import { run, get } from '../config/database.js';
  */
 const createTransporter = () => {
     // Use environment variables for email configuration
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
         port: process.env.SMTP_PORT || 587,
         secure: false,
@@ -32,13 +32,13 @@ const getAdminEmail = () => {
 export const sendQuotationEmail = async (quotationId, options = {}) => {
     try {
         // Fetch quotation with items
-        const quotation = Quotation.findById(quotationId);
+        const quotation = await Quotation.findById(quotationId);
         if (!quotation) {
             throw new Error('Quotation not found');
         }
 
         // Fetch quotation items
-        const items = get(`
+        const items = await get(`
             SELECT * FROM quotation_items 
             WHERE quotation_id = ?
             ORDER BY id ASC
@@ -99,7 +99,7 @@ export const sendQuotationEmail = async (quotationId, options = {}) => {
         const info = await transporter.sendMail(mailOptions);
 
         // Update quotation record
-        run(`
+        await run(`
             UPDATE quotations 
             SET sent_at = CURRENT_TIMESTAMP,
                 sent_by = ?,
@@ -110,7 +110,7 @@ export const sendQuotationEmail = async (quotationId, options = {}) => {
 
         // Update request funnel stage if request_id exists
         if (quotation.request_id) {
-            run(`
+            await run(`
                 UPDATE requests 
                 SET funnel_stage = 'Quoted'
                 WHERE id = ?
@@ -131,9 +131,9 @@ export const sendQuotationEmail = async (quotationId, options = {}) => {
 /**
  * Get email thread information from request
  */
-export const getEmailThreadInfo = (requestId) => {
+export const getEmailThreadInfo = async (requestId) => {
     try {
-        const request = get('SELECT email_message_id, email_references FROM requests WHERE id = ?', [requestId]);
+        const request = await get('SELECT email_message_id, email_references FROM requests WHERE id = ?', [requestId]);
 
         if (!request) {
             return null;

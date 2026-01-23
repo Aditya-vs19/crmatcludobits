@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import './SmartDropdown.css';
 
 /**
  * SmartDropdown - A dropdown that pulls from DB and allows manual override

@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import api from '../services/api';
 import './Dashboard.css';
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
-  const [quotationStats, setQuotationStats] = useState(null);
+
   const [emailStats, setEmailStats] = useState(null);
   const [requests, setRequests] = useState([]);
   const [emails, setEmails] = useState([]);
@@ -18,16 +20,14 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [statsRes, quotationsRes, requestsRes, emailsRes, emailStatsRes] = await Promise.all([
+      const [statsRes, requestsRes, emailsRes, emailStatsRes] = await Promise.all([
         api.get('/requests/stats'),
-        api.get('/quotations/stats').catch(() => ({ data: { data: null } })),
         api.get('/requests?limit=10'),
         api.get('/emails?limit=5').catch(() => ({ data: { data: [] } })),
         api.get('/emails/stats').catch(() => ({ data: { data: null } })),
       ]);
 
       setStats(statsRes.data.data);
-      setQuotationStats(quotationsRes.data.data);
       setRequests(requestsRes.data.data || []);
       setEmails(emailsRes.data.data || []);
       setEmailStats(emailStatsRes.data.data);
@@ -114,82 +114,6 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Two Column Grid */}
-      <div className="dashboard-grid">
-        {/* Funnel Stage Counts */}
-        <div className="section-card">
-          <div className="section-header">
-
-            <h3 className="section-title">Funnel Stages</h3>
-          </div>
-          <div className="section-content">
-            <div className="category-list">
-              {stats?.byStage?.map((stage) => (
-                <div key={stage.funnel_stage} className="category-item">
-                  <span className="category-name">{stage.funnel_stage}</span>
-                  <div className="category-bar">
-                    <div
-                      className="category-bar-fill"
-                      style={{ width: `${getStagePercent(stage.count)}%` }}
-                    ></div>
-                  </div>
-                  <span className="category-count">{stage.count}</span>
-                </div>
-              )) || (
-                  <div style={{ color: '#a3a3a3', fontSize: '0.875rem' }}>No data available</div>
-                )}
-            </div>
-          </div>
-        </div>
-
-        {/* Workflow Status */}
-        <div className="section-card">
-          <div className="section-header">
-
-            <h3 className="section-title">Workflow Status</h3>
-          </div>
-          <div className="section-content">
-            <div className="workflow-list">
-              <div className="workflow-item">
-                <span className="workflow-label">Open</span>
-                <span className="workflow-percent">{getStagePercent(stats?.newRequests || 0)}%</span>
-                <div className="workflow-bar">
-                  <div
-                    className="workflow-bar-fill open"
-                    style={{ width: `${getStagePercent(stats?.newRequests || 0)}%` }}
-                  ></div>
-                </div>
-                <span className="workflow-count">{stats?.newRequests || 0}</span>
-              </div>
-
-              <div className="workflow-item">
-                <span className="workflow-label">In Progress</span>
-                <span className="workflow-percent">{getStagePercent(stats?.assigned || 0)}%</span>
-                <div className="workflow-bar">
-                  <div
-                    className="workflow-bar-fill progress"
-                    style={{ width: `${getStagePercent(stats?.assigned || 0)}%` }}
-                  ></div>
-                </div>
-                <span className="workflow-count">{stats?.assigned || 0}</span>
-              </div>
-
-              <div className="workflow-item">
-                <span className="workflow-label">Closed</span>
-                <span className="workflow-percent">{getStagePercent(stats?.quoted || 0)}%</span>
-                <div className="workflow-bar">
-                  <div
-                    className="workflow-bar-fill closed"
-                    style={{ width: `${getStagePercent(stats?.quoted || 0)}%` }}
-                  ></div>
-                </div>
-                <span className="workflow-count">{stats?.quoted || 0}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Recent Emails Table */}
       <div className="section-card">
         <div className="section-header">
@@ -226,7 +150,7 @@ const AdminDashboard = () => {
                     </td>
                     <td>{new Date(email.received_at).toLocaleString()}</td>
                     <td>
-                      <button className="action-btn">View</button>
+                      <button className="action-btn" onClick={() => navigate('/emails')}>View</button>
                     </td>
                   </tr>
                 ))
@@ -235,36 +159,6 @@ const AdminDashboard = () => {
           </table>
         </div>
       </div>
-
-      {/* Quotation Stats */}
-      {quotationStats && (
-        <div className="section-card">
-          <div className="section-header">
-
-            <h3 className="section-title">Quotation Metrics</h3>
-          </div>
-          <div className="section-content">
-            <div className="stats-grid" style={{ marginBottom: 0 }}>
-              <div className="stat-card">
-                <div className="stat-label">Total Quotations</div>
-                <div className="stat-value">{quotationStats.total || 0}</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">Draft</div>
-                <div className="stat-value">{quotationStats.draft || 0}</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">Sent</div>
-                <div className="stat-value info">{quotationStats.sent || 0}</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">Accepted</div>
-                <div className="stat-value success">{quotationStats.accepted || 0}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Recent Requests Table */}
       <div className="section-card">
@@ -308,7 +202,7 @@ const AdminDashboard = () => {
                     </td>
                     <td>{new Date(request.created_at).toLocaleDateString()}</td>
                     <td>
-                      <button className="action-btn">View</button>
+                      <button className="action-btn" onClick={() => navigate(`/admin/requests`)}>View</button>
                     </td>
                   </tr>
                 ))

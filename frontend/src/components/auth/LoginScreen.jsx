@@ -50,23 +50,25 @@ const LoginScreen = () => {
 
     return (
         <div className="login-container">
-            {/* Left Side - Login Form */}
-            <div className="login-left">
-                <div className="login-form-wrapper">
-                    {/* Logo */}
+            {/* Left Side - Logo Panel */}
+            <div className="logo-panel">
+                <div className="logo-panel-content">
                     <div className="logo-container">
                         <img
                             src="/logo.png"
                             alt="CludoBits"
-                            className="logo-image"
+                            className="brand-logo"
                         />
                     </div>
+                    <p className="brand-tagline">Building Future With Tech</p>
+                </div>
+            </div>
 
-                    {/* Form Header */}
-                    <div className="form-header">
-                        <h1>Welcome Back</h1>
-                        <p>Sign in to access your dashboard</p>
-                    </div>
+            {/* Right Side - Login Form */}
+            <div className="login-panel">
+                <div className="login-card">
+                    <h1 className="login-title">Welcome Back</h1>
+                    <p className="login-subtitle">Sign in to access your dashboard</p>
 
                     {/* Error Banner */}
                     {localError && (
@@ -86,7 +88,7 @@ const LoginScreen = () => {
                                 id="email"
                                 type="email"
                                 className="form-input"
-                                placeholder="yourname@company.com"
+                                placeholder="Enter your email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 disabled={isLoading}
@@ -142,43 +144,6 @@ const LoginScreen = () => {
                     {/* Footer */}
                     <div className="form-footer">
                         <p className="copyright">© 2026 CludoBits. All rights reserved.</p>
-                        <a href="#" className="terms-link">Terms & Conditions</a>
-                    </div>
-                </div>
-            </div>
-
-            {/* Right Side - Image */}
-            <div className="login-right">
-                <div className="image-overlay">
-                    {/* Floating Cards */}
-                    <div className="floating-card card-1">
-                        <div className="card-header">
-                            <span className="card-title">Task Management</span>
-                            <span className="card-status"></span>
-                        </div>
-                        <p className="card-time">Real-time Updates</p>
-                    </div>
-
-                    <div className="floating-card card-2">
-                        <div className="calendar-row">
-                            <span>Mon</span>
-                            <span>Tue</span>
-                            <span>Wed</span>
-                            <span>Thu</span>
-                            <span>Fri</span>
-                        </div>
-                        <div className="calendar-dates">
-                            <span>13</span>
-                            <span className="active">14</span>
-                            <span>15</span>
-                            <span>16</span>
-                            <span>17</span>
-                        </div>
-                    </div>
-
-                    <div className="floating-card card-3">
-                        <span className="meeting-title">Team Sync</span>
-                        <span className="meeting-time">2:00pm - 3:00pm</span>
                     </div>
                 </div>
             </div>

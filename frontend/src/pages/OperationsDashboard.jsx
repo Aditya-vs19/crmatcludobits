@@ -88,49 +88,6 @@ const OperationsDashboard = () => {
                 </div>
             </div>
 
-            {/* Workflow Progress */}
-            <div className="section-card">
-                <div className="section-header">
-
-                    <h3 className="section-title">Workflow Status</h3>
-                </div>
-                <div className="section-content">
-                    <div className="workflow-list">
-                        <div className="workflow-item">
-                            <span className="workflow-label">Assigned</span>
-                            <div className="workflow-bar">
-                                <div
-                                    className="workflow-bar-fill open"
-                                    style={{ width: `${stats?.total ? (stats.assigned / stats.total) * 100 : 0}%` }}
-                                ></div>
-                            </div>
-                            <span className="workflow-count">{stats?.assigned || 0}</span>
-                        </div>
-
-                        <div className="workflow-item">
-                            <span className="workflow-label">In Progress</span>
-                            <div className="workflow-bar">
-                                <div
-                                    className="workflow-bar-fill progress"
-                                    style={{ width: `${stats?.total ? (stats.inProgress / stats.total) * 100 : 0}%` }}
-                                ></div>
-                            </div>
-                            <span className="workflow-count">{stats?.inProgress || 0}</span>
-                        </div>
-
-                        <div className="workflow-item">
-                            <span className="workflow-label">Completed</span>
-                            <div className="workflow-bar">
-                                <div
-                                    className="workflow-bar-fill closed"
-                                    style={{ width: `${stats?.total ? (stats.completed / stats.total) * 100 : 0}%` }}
-                                ></div>
-                            </div>
-                            <span className="workflow-count">{stats?.completed || 0}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {/* Recent Requests */}
             <div className="section-card">

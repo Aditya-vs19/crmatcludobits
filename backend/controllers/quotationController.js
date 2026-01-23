@@ -18,7 +18,27 @@ export const createQuotation = async (req, res) => {
             notes,
             status,
             autoSaveProduct,
+            // New fields
+            referenceNumber,
+            customerCompany,
+            customerAddress,
+            attentionTo,
+            subject,
+            paymentTerms,
+            freight,
+            warrantyTerms,
+            delivery,
+            validityDate,
+            validity, // Frontend might send this
+            quotationDate, // Frontend sends this
+            gstin,
+            unitRate
         } = req.body;
+
+        // Map frontend fields if necessary
+        const finalValidityDate = validityDate || validity;
+        // Note: quotationDate is currently not used in DB (uses created_at), but we generally rely on generated PDF date which uses created_at. 
+        // If we want to support custom date, we need to override created_at or add a column. For now, ignoring to fix the crash.
 
         // Validation
         if (!customerEmail || !productName) {
@@ -68,7 +88,33 @@ export const createQuotation = async (req, res) => {
             notes,
             status,
             createdBy: req.user.id,
+            referenceNumber,
+            customerCompany,
+            customerAddress,
+            attentionTo,
+            subject,
+            paymentTerms,
+            freight,
+            warrantyTerms,
+            delivery,
+            validityDate: finalValidityDate,
+            validityDate: finalValidityDate,
+            gstin
         });
+
+        // Automatically create a quotation item to handle pricing and totals
+        if (productName && unitRate) {
+            await Quotation.addItem(quotation.id, {
+                productName,
+                specifications,
+                quantity: quantity || 1,
+                unitPrice: parseFloat(unitRate) || 0
+            });
+
+            // Re-fetch quotation to get updated totals
+            const updatedQuotation = await Quotation.findById(quotation.id);
+            Object.assign(quotation, updatedQuotation);
+        }
 
         res.status(201).json({
             success: true,

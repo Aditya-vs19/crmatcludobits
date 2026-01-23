@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './QuotationList.css';
 
 const QuotationList = ({ quotations, onEdit, onDelete }) => {
     const [expandedId, setExpandedId] = useState(null);

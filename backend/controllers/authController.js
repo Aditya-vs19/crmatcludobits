@@ -1,5 +1,6 @@
 import { User } from '../models/User.js';
 import { generateTokens, verifyToken } from '../utils/jwt.js';
+import bcrypt from 'bcryptjs';
 
 /**
  * Register a new user
@@ -194,6 +195,68 @@ export const getCurrentUser = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to get user information',
+        });
+    }
+};
+
+/**
+ * Change password
+ */
+export const changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.user.id;
+
+        // Validation
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Current and new password are required'
+            });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: 'New password must be at least 6 characters long'
+            });
+        }
+
+        // Find user
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Verify current password
+        const isValidPassword = await User.verifyPassword(currentPassword, user.password);
+        if (!isValidPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Incorrect current password'
+            });
+        }
+
+        // Hash new password manually since User.update doesn't hash
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        // Update password
+        await User.update(userId, { password: hashedPassword });
+
+        res.json({
+            success: true,
+            message: 'Password updated successfully'
+        });
+
+    } catch (error) {
+        console.error('Change password error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update password'
         });
     }
 };

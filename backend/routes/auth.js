@@ -1,5 +1,5 @@
 import express from 'express';
-import { register, login, refresh, getCurrentUser } from '../controllers/authController.js';
+import { register, login, refresh, getCurrentUser, changePassword } from '../controllers/authController.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.post('/refresh', refresh);
 
 // Protected routes
 router.get('/me', authenticate, getCurrentUser);
+router.put('/profile/password', authenticate, changePassword);
 
 // Admin only - get all users
 router.get('/users', authenticate, authorize('Admin'), async (req, res) => {

@@ -1,17 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../components/layout/DashboardLayout';
-import QuotationForm from '../components/quotations/QuotationForm';
 import QuotationList from '../components/quotations/QuotationList';
 import api from '../services/api';
-import './QuotationManagement.css';
+import './Dashboard.css';
 
 const QuotationManagement = () => {
     const { user } = useAuth();
     const [quotations, setQuotations] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
-    const [editingQuotation, setEditingQuotation] = useState(null);
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -32,54 +29,16 @@ const QuotationManagement = () => {
         }
     };
 
-    const handleCreateQuotation = () => {
-        setEditingQuotation(null);
-        setShowForm(true);
-    };
-
-    const handleEditQuotation = (quotation) => {
-        setEditingQuotation(quotation);
-        setShowForm(true);
-    };
-
-    const handleDeleteQuotation = async (quotationId) => {
-        try {
-            await api.delete(`/quotations/${quotationId}`);
-            await fetchQuotations();
-        } catch (error) {
-            console.error('Error deleting quotation:', error);
-            alert(error.response?.data?.message || 'Failed to delete quotation');
-        }
-    };
-
-    const handleFormClose = () => {
-        setShowForm(false);
-        setEditingQuotation(null);
-    };
-
-    const handleQuotationSaved = () => {
-        fetchQuotations();
-    };
-
-    // Check if user has permission to manage quotations
-    const canManageQuotations = user && ['Admin', 'Sales', 'Operations'].includes(user.role);
-    const canDeleteQuotations = user && user.role === 'Admin';
-
     return (
         <DashboardLayout>
             <div className="quotation-management">
                 <div className="page-header">
                     <div className="header-content">
-                        <h1>Quotation Management</h1>
+                        <h1>Quotation History</h1>
                         <p className="header-subtitle">
-                            Create and manage quotations with smart product and specification dropdowns
+                            View all sent and drafted quotations
                         </p>
                     </div>
-                    {canManageQuotations && (
-                        <button onClick={handleCreateQuotation} className="btn btn-primary">
-                            + Create Quotation
-                        </button>
-                    )}
                 </div>
 
                 {error && (
@@ -96,16 +55,7 @@ const QuotationManagement = () => {
                 ) : (
                     <QuotationList
                         quotations={quotations}
-                        onEdit={canManageQuotations ? handleEditQuotation : null}
-                        onDelete={canDeleteQuotations ? handleDeleteQuotation : null}
-                    />
-                )}
-
-                {showForm && (
-                    <QuotationForm
-                        quotation={editingQuotation}
-                        onClose={handleFormClose}
-                        onSaved={handleQuotationSaved}
+                    // Read-only: no onEdit or onDelete passed
                     />
                 )}
             </div>

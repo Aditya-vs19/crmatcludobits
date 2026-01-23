@@ -1,5 +1,3 @@
-import './EmailDetailModal.css';
-
 const EmailDetailModal = ({ email, onClose }) => {
     if (!email) return null;
 

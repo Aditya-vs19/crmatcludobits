@@ -1,5 +1,3 @@
-import './Table.css';
-
 const Table = ({ columns, data, onRowClick }) => {
     return (
         <div className="table-wrapper">

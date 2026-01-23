@@ -4,7 +4,6 @@ import { useAuth } from '../../context/AuthContext';
 import './DashboardLayout.css';
 
 const DashboardLayout = ({ children }) => {
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -18,13 +17,12 @@ const DashboardLayout = ({ children }) => {
             { id: 'products', label: 'Products', path: '/products' },
             { id: 'quotations', label: 'Quotations', path: '/quotations' },
             { id: 'emails', label: 'Emails', path: '/emails' },
-            { id: 'analytics', label: 'Analytics', path: `/${user?.role?.toLowerCase()}/analytics` },
         ];
 
         // Admin gets additional items
         if (user?.role === 'Admin') {
             baseItems.push({ id: 'users', label: 'Users', path: '/admin/users' });
-            baseItems.push({ id: 'settings', label: 'Settings', path: '/admin/settings' });
+            baseItems.push({ id: 'settings', label: 'Account Settings', path: '/admin/settings' });
         }
 
         return baseItems;
@@ -50,24 +48,11 @@ const DashboardLayout = ({ children }) => {
     return (
         <div className="dashboard-layout">
             {/* Sidebar */}
-            <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+            <aside className="sidebar">
                 <div className="sidebar-header">
                     <div className="logo">
-                        {sidebarCollapsed ? (
-                            <div className="logo-icon">
-                                <img src="/logo.png" alt="CludoBits" onError={(e) => e.target.style.display = 'none'} />
-                            </div>
-                        ) : (
-                            <img src="/logo.png" alt="CludoBits" className="logo-full" onError={(e) => e.target.style.display = 'none'} />
-                        )}
+                        <img src="/logo.png" alt="CludoBits" className="logo-full" onError={(e) => e.target.style.display = 'none'} />
                     </div>
-                    <button
-                        className="collapse-btn"
-                        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                        aria-label="Toggle Sidebar"
-                    >
-                        {sidebarCollapsed ? '→' : '←'}
-                    </button>
                 </div>
 
                 <nav className="sidebar-nav">
@@ -76,26 +61,12 @@ const DashboardLayout = ({ children }) => {
                             key={item.id}
                             className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
                             onClick={() => handleNavigation(item.path)}
-                            title={sidebarCollapsed ? item.label : ''}
                         >
                             <span className="nav-label">{item.label}</span>
                         </button>
                     ))}
                 </nav>
 
-                <div className="sidebar-footer">
-                    {!sidebarCollapsed && (
-                        <div className="sidebar-user">
-                            <div className="user-avatar">
-                                {user?.email?.[0].toUpperCase()}
-                            </div>
-                            <div className="user-info">
-                                <p className="user-name">{user?.email?.split('@')[0]}</p>
-                                <p className="user-email">{user?.email}</p>
-                            </div>
-                        </div>
-                    )}
-                </div>
             </aside>
 
             {/* Main Content */}
